@@ -1,4 +1,4 @@
-import { pool } from "../db.config.js";
+import { pool, prisma } from "../db.config.js";
 
 export const getStoreIdByMissionId = async (missionId) => {
   const conn = await pool.getConnection();
@@ -43,5 +43,34 @@ export const createReviewImage = async (reviewId, imageUrl) => {
     throw new Error(`이미지 저장 중 오류가 발생했어요. (${err.message})`);
   } finally {
     conn.release();
+  }
+};
+
+export const getMyReviewList = async (userId, cursor) => {
+  try {
+    const reviews = await prisma.review.findMany({
+      where: {
+        userId: userId,
+        id: { gt: cursor },
+      },
+      select: {
+        id: true,
+        rating: true,
+        comment: true,
+        createdAt: true,
+        store: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return reviews;
+  } catch (err) {
+    throw new Error(`내 리뷰 불러오기 중 오류가 발생했어요. (${err.message})`);
   }
 };

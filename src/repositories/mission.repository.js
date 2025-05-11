@@ -1,4 +1,4 @@
-import { pool } from "../db.config.js";
+import { pool, prisma } from "../db.config.js";
 
 export const getStoreNameByStoreId = async (storeId) => {
   const conn = await pool.getConnection();
@@ -29,4 +29,29 @@ export const createMission = async (storeId, description, reward, deadline) => {
   } finally {
     conn.release();
   }
+};
+
+export const getAllUserMissions = async (userId, cursor) => {
+  const missions = await prisma.mission.findMany({
+    where: {
+      usersMissions: {
+        some: {
+          userId: userId,
+          status: "ongoing",
+          missionId: { gt: cursor },
+        },
+      },
+    },
+    select: {
+      id: true,
+      description: true,
+      rewardPoint: true,
+      deadline: true,
+    },
+    orderBy: {
+      deadline: "desc",
+    },
+  });
+
+  return missions;
 };
