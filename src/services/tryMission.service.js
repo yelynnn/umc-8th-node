@@ -7,7 +7,7 @@ export const tryMission = async (userId, missionId) => {
   const alreadyTried = await checkMissionAlreadyTried(userId, missionId);
 
   if (alreadyTried === true) {
-    throw new Error("이미 도전 중인 미션입니다.");
+    throw new DuplicateUserEmailError("이미 도전 중인 미션입니다.", data);
   }
   const usersMissionId = await insertUsersMission(userId, missionId);
 

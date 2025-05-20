@@ -7,7 +7,7 @@ export const getStoreNameByStoreId = async (storeId) => {
       storeId,
     ]);
     if (rows.length === 0) {
-      throw new Error("존재하지 않는 가게입니다.");
+      throw new DuplicateUserEmailError("존재하지 않는 가게입니다.", data);
     }
     return rows[0].name;
   } finally {
@@ -25,7 +25,10 @@ export const createMission = async (storeId, description, reward, deadline) => {
     );
     return result.insertId;
   } catch (err) {
-    throw new Error(`미션 생성 중 오류가 발생했어요. (${err.message})`);
+    throw new DuplicateUserEmailError(
+      "미션 생성 중 오류가 발생했습니다.",
+      data
+    );
   } finally {
     conn.release();
   }
